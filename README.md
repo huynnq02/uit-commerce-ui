@@ -1,4 +1,5 @@
 # UIT Commerce
+- This is a UI project that  connects to a Python API
 # First Launch: 
 npm install vite
 # Start: 
