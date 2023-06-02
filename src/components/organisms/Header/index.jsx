@@ -59,7 +59,7 @@ const Header = ({ authen }) => {
     <header className="landingpage-header d-flex flex-column justify-content-between align-items-center">
       <div className="upper-nav d-flex justify-content-between align-items-center">
         <Link className="logo" to={"/"}>
-          Yame
+          UIT Commerce
         </Link>
 
         <nav className="nav-bar d-flex align-items-center justify-content-between">

@@ -67,6 +67,8 @@ const SignInPage = (props) => {
     } catch (errors) {
       toast.error("Your email or password is incorrect");
     }
+    // navigate("/");
+
   };
   //Sign in with google
   const googleSignIn = async () => {

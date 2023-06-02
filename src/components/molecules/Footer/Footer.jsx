@@ -14,11 +14,11 @@ const Footer = () => {
         <div className="containerInfoAndSocialLinks">
           {/* container Company Info */}
           <div className="containerFooterInfo">
-            <h3>Yame</h3>
-            <p>336 Võ Văn Ngân</p>
-            <p>TP.HCM</p>
+            <h3>UIT Commerce</h3>
+            <p>KTX Khu A</p>
+            <p>Bình Dương</p>
             <p>Việt Nam</p>
-            <p>Góp ý:(028) 7307 1441</p>
+            <p>Góp ý: huyy.802@gmail.com</p>
           </div>
 
           {/* container Social links */}
@@ -101,8 +101,11 @@ const Footer = () => {
       {/*----- container with Line devide -----*/}
       <div className="containerLineDevide">
         <div></div>
-        <p>© 2022 - CÔNG TY TNHH YAME VN</p>
-        <p>Giấy CNĐKDN: 0310874914 – Ngày cấp: 25/11/2011 - Cơ quan cấp: Phòng Đăng Ký Kinh Doanh – Sở Kế Hoạch và Đầu Tư TP.HCM</p>
+        <p>© 2022 - CÔNG TY TNHH UIT VN</p>
+        <p>
+          Giấy CNĐKDN: 0310874914 – Ngày cấp: 25/11/2011 - Cơ quan cấp: Phòng
+          Đăng Ký Kinh Doanh – Sở Kế Hoạch và Đầu Tư Tỉnh Bình Dương
+        </p>
       </div>
     </div>
   );
