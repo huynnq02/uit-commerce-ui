@@ -19,8 +19,10 @@ import ProductDetailContent from "../../organisms/ProductDetail/ProductDetailCon
 import ProductDetailJoin from "../../organisms/ProductDetail/ProductDetailJoin";
 import ProductDetailList from "../../organisms/ProductDetail/ProductDetailList";
 import ProductReview from "../../organisms/ProductDetail/ProductReview";
+import { useSelector } from "react-redux";
 
 const ProductDetail = () => {
+  console.log("go to product detail");
   const mdMatches = useMediaQuery("(min-width:600px)");
   const lgMatches = useMediaQuery("(min-width:1200px)");
   useEffect(() => {
@@ -35,23 +37,21 @@ const ProductDetail = () => {
   const [quant, setQuant] = useState(1);
   const [listImages, setListImages] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
-
+  const products = useSelector((state) => state.products.products);
   useEffect(() => {
     (async () => {
       if (!id) return;
       else {
-        console.log("Trước khi gọi query");
-        const docRef = doc(db, "products", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const data = products.find((product) => product.id === id);
+        if (data) {
+          console.log("data: ", data);
           handleGetListProductWithCategories(data.category);
           setProductDetail(data);
           setSizePicker(data.sizes[0]);
-          setListImages([data.image, ...data.detailImages]);
-          setColorPicker(data.color[0]);
+          setListImages([data.image, ...data.detail_image]);
+          setColorPicker(data.colors[0]);
         } else {
-          console.log("no data");
+          console.log("No data");
         }
       }
     })();

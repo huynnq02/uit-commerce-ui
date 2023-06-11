@@ -11,7 +11,6 @@ import React, { useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase/firebase-config";
 import { useDispatch } from "react-redux";
-import { addProducts } from "../../../store/reducers/productsSlice";
 
 const ThemedCheckbox = ({ onChange }) => {
   return (

@@ -15,10 +15,7 @@ import backgroundImage from "../../../assets/background-banner.jpg";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase/firebase-config";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  filterProducts,
-  addProducts,
-} from "../../../store/reducers/productsSlice";
+import { getAPIActionJSON } from "../../../../api/ApiActions";
 
 const container = window !== undefined ? () => window.document.body : undefined;
 
@@ -94,7 +91,11 @@ const ShoppingList = () => {
           );
         }
       });
-      dispatch(filterProducts(temp));
+      dispatch({
+        type: "FILTER_PRODUCTS",
+        payload: temp,
+      });
+      // dispatch(filterProducts(temp));
     } else if (tempPos.length > 1) {
       let resArr = [];
       if (tempPos[0] === "category") {
@@ -154,8 +155,11 @@ const ShoppingList = () => {
           );
         }
       });
-
-      dispatch(filterProducts(resArr));
+      dispatch({
+        type: "FILTER_PRODUCTS",
+        payload: resArr,
+      });
+      // dispatch(filterProducts(resArr));
     } else {
       let resArr = [];
 
@@ -176,22 +180,34 @@ const ShoppingList = () => {
       querySnapshot.forEach((doc) => {
         resArr.push({ data: doc.data(), id: doc.id });
       });
-
-      dispatch(filterProducts(resArr));
+      dispatch({
+        type: "FILTER_PRODUCTS",
+        payload: resArr,
+      });
+      // dispatch(filterProducts(resArr));
     }
   };
+  const productData = useSelector((state) => state.products.filteredProducts);
 
+  console.log("hahahaa:", productData);
+  const handleResponse = (response) => {
+    if (!response.results.success) {
+      console.log("nooooooooooooo", response);
+      return;
+    } else {
+      console.log("zeessss");
+    }
+  };
+  const getData = () => {
+    dispatch(
+      getAPIActionJSON("get_all_items", null, null, "", (e) =>
+        handleResponse(e)
+      )
+    );
+  };
   useEffect(() => {
     if (products.length === 0) {
-      (async () => {
-        const q = query(collection(db, "products"));
-        const querySnapshot = await getDocs(q);
-        let res = [];
-        querySnapshot.forEach((doc) => {
-          res.push({ data: doc.data(), id: doc.id });
-        });
-        dispatch(addProducts(res));
-      })();
+      getData();
     }
     (async () => {
       const categoryQuery = query(collection(db, "categories"));
@@ -204,7 +220,11 @@ const ShoppingList = () => {
       setProductCategoryList([...res]);
     })();
     return () => {
-      dispatch(filterProducts([...products]));
+      dispatch({
+        type: "FILTER_PRODUCTS",
+        payload: products,
+      });
+      // dispatch(filterProducts([...products]));
     };
   }, []);
 

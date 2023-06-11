@@ -11,12 +11,9 @@ const ProductList = (props) => {
   const { filteredProducts } = useSelector((state) => state.products);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  //USEMEDIAQUERY to check true or false of the current width screen
   const smMatches = useMediaQuery("(min-width:600px)");
   const mdMatches = useMediaQuery("(min-width:900px)");
   const lgMatches = useMediaQuery("(min-width:1200px)");
-
-  //fetch products trên firestore xuống redux
 
   let responsiveProductStyle;
   if (!smMatches) {
@@ -53,8 +50,8 @@ const ProductList = (props) => {
       description: data.description,
       quantity: 1,
       sizes: data.sizes[0],
-      stock: data.quantities,
-      color: data.color[0],
+      stock: data.quantity,
+      color: data.colors[0],
       image: data.image,
       totalPrice: data.price * 1,
       productId: data.id,
@@ -70,8 +67,8 @@ const ProductList = (props) => {
       description: data.description,
       quantity: 1,
       sizes: data.sizes[0],
-      stock: data.quantities,
-      color: data.color[0],
+      stock: data.quantity,
+      color: data.colors[0],
       image: data.image,
       totalPrice: data.price * 1,
       productId: data.id,
@@ -79,13 +76,12 @@ const ProductList = (props) => {
     dispatch(addBasket(productStringify));
     navigate("/checkout");
   };
-  //TODO: NEED TO WORK ON CASE WHERE TITLES CAN BE TOO LONG
+
   return (
     <Grid container spacing={{ lg: 4, xs: 4 }}>
       {filteredProducts.map(
         (item, index) =>
-          item.data?.active && (
-            //GOT TO CHANGE THIS WITH LINK (REACT ROUTER)
+          item.active && (
             <Grid
               item
               xs={6}
@@ -95,7 +91,6 @@ const ProductList = (props) => {
               sx={{ width: "100%", cursor: "pointer" }}
               key={index}
             >
-              {/* {console.log(item.data)} */}
               <div
                 className="product-card-img d-flex justify-content-center"
                 data-aos="fade-up"
@@ -103,8 +98,8 @@ const ProductList = (props) => {
               >
                 <img
                   style={responsiveProductStyle}
-                  src={item.data.image}
-                  alt={item.data.name}
+                  src={item.image}
+                  alt={item.name}
                   onClick={() => navigate(`/products/${item.id}`)}
                 />
                 <div className="product-card-img-button">
@@ -113,7 +108,7 @@ const ProductList = (props) => {
                     padding="16px 0"
                     txtColor="#fff"
                     bgColor="#2a254b"
-                    onClick={handleAddToBasket.bind(this, item.data)}
+                    onClick={() => handleAddToBasket(item)}
                   >
                     Add to cart
                   </Button>
@@ -123,7 +118,7 @@ const ProductList = (props) => {
                     txtColor="#2A254B"
                     bgColor="#F9F9F9"
                     margin="10px 0"
-                    onClick={handleGoToCheckout.bind(this, item.data)}
+                    onClick={() => handleGoToCheckout(item)}
                   >
                     Buy now
                   </Button>
@@ -150,7 +145,7 @@ const ProductList = (props) => {
                       whiteSpace: "initial",
                     }}
                   >
-                    {item.data.name}
+                    {item.name}
                   </span>
                 }
                 subtitle={
@@ -163,7 +158,7 @@ const ProductList = (props) => {
                       lineHeight: "150%",
                     }}
                   >
-                    {item.data.price.toLocaleString("vi-vn", {
+                    {parseFloat(item.price).toLocaleString("vi-vn", {
                       style: "currency",
                       currency: "VND",
                     })}

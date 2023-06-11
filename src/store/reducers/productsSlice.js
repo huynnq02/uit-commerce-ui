@@ -1,35 +1,46 @@
-import { createSlice } from "@reduxjs/toolkit";
+const initialState = {
+  products: [],
+  filteredProducts: [],
+};
 
-const productsSlice = createSlice({
-  name: "products",
-  initialState: {
-    products: [],
-    filteredProducts: [],
-  },
-  reducers: {
-    addProducts(state, action) {
-      // state.products.push({ data: action.payload.data, id: action.payload.id });
-      // state.filteredProducts.push({
-      //   data: action.payload.data,
-      //   id: action.payload.id,
-      // });
-      state.products = action.payload;
-      state.filteredProducts = action.payload;
-    },
-    filterProducts(state, action) {
-      if (action.payload.data === null) {
-        state.filteredProducts = [];
+const productReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "get_all_items.reply":
+      if (action.data.results.success === true) {
+        console.log("HAHHAAHHAA");
+        console.log(action.data.results.data);
+        return {
+          ...state,
+          products: action.data.results.data,
+          filteredProducts: action.data.results.data,
+        };
       } else {
-        // state.filteredProducts = [];
-        state.filteredProducts = action.payload;
+        return {
+          ...state,
+          errorMessage: "Can't get items",
+        };
       }
-    },
-  },
-});
+    case "ADD_PRODUCTS":
+      return {
+        ...state,
+        products: action.payload,
+        filteredProducts: action.payload,
+      };
+    case "FILTER_PRODUCTS":
+      if (action.payload === null) {
+        return {
+          ...state,
+          filteredProducts: [],
+        };
+      } else {
+        return {
+          ...state,
+          filteredProducts: action.payload,
+        };
+      }
+    default:
+      return state;
+  }
+};
 
-//get reducer and action in redux slice
-const { actions, reducer } = productsSlice;
-
-export const { addProducts, filterProducts } = actions;
-
-export default reducer;
+export default productReducer;

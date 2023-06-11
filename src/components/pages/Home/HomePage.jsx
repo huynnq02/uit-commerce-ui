@@ -8,7 +8,6 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "../../../firebase/firebase-config";
-import { addProducts } from "../../../store/reducers/productsSlice.js";
 import { useAuth } from "../../../contexts/auth-context";
 import Footer from "../../molecules/Footer/Footer";
 import Feature2 from "../../organisms/Features2";
@@ -16,24 +15,41 @@ import FeaturesBlock from "../../organisms/FeaturesBlock";
 import HeroBlock from "../../organisms/HeroBlock";
 import ProductList from "../../organisms/ProductList/ProductList";
 import Subscribe from "../../organisms/Subcribe";
-
+import { getAPIActionJSON } from "../../../../api/ApiActions";
 const HomePage = () => {
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.products);
   const smMatches = useMediaQuery("(min-width:600px)");
   const lgMatches = useMediaQuery("(min-width:1200px)");
   const { userInfo, loading } = useAuth();
-
+  const productData = useSelector((state) => state.products.filteredProducts);
+  console.log("hahahaa:", productData);
+  const handleResponse = (response) => {
+    if (!response.results.success) {
+      console.log("nooooooooooooo", response);
+      return;
+    } else {
+      console.log("zeessss");
+    }
+  };
+  const getData = () => {
+    dispatch(
+      getAPIActionJSON("get_all_items", null, null, "", (e) =>
+        handleResponse(e)
+      )
+    );
+  };
   useEffect(() => {
-    (async () => {
-      const q = query(collection(db, "products"));
-      const querySnapshot = await getDocs(q);
-      let res = [];
-      querySnapshot.forEach((doc) => {
-        res.push({ data: doc.data(), id: doc.id });
-      });
-      dispatch(addProducts(res));
-    })();
+    // (async () => {
+    //   const q = query(collection(db, "products"));
+    //   const querySnapshot = await getDocs(q);
+    //   let res = [];
+    //   querySnapshot.forEach((doc) => {
+    //     res.push({ data: doc.data(), id: doc.id });
+    //   });
+    //   dispatch({ type: "ADD_PRODUCTS", payload: res });
+    // })();
+    getData();
   }, []);
 
   return (
