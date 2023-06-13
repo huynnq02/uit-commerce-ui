@@ -1,17 +1,34 @@
-import store from "../../index";
 const initialState = {
   id: "",
   name: "",
   email: "",
-  hotLine: "",
-  profilePicture: "",
+  phone_number: "",
+  profile_picture: "",
   address: "",
   items: [],
   isLoggedIn: false,
+  orders: [],
 };
 
 export default function UserReducer(state = initialState, action) {
   switch (action.type) {
+    case "update_user.reply":
+      if (action.data.success === true) {
+        return {
+          ...state,
+          id: action.data.data.id,
+          name: action.data.data.name,
+          email: action.data.data.email,
+          phone_number: action.data.data.phone_number,
+          profile_picture: action.data.data.profile_picture,
+          address: action.data.data.address,
+          items: action.data.data.items,
+          orders: action.data.data.orders,
+          isLoggedIn: true,
+        };
+      } else {
+        console.log("Hinh nhu sai o dau do roi huhu");
+      }
     case "login_user.reply":
       if (action.data.success === true) {
         return {
@@ -19,10 +36,11 @@ export default function UserReducer(state = initialState, action) {
           id: action.data.data.id,
           name: action.data.data.name,
           email: action.data.data.email,
-          hotLine: action.data.data.hotLine,
-          profilePicture: action.data.data.profilePicture,
+          phone_number: action.data.data.phone_number,
+          profile_picture: action.data.data.profile_picture,
           address: action.data.data.address,
           items: action.data.data.items,
+          orders: action.data.data.orders,
           isLoggedIn: true,
         };
       }

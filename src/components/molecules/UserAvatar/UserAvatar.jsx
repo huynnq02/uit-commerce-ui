@@ -1,6 +1,6 @@
 import { signOut } from "firebase/auth";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { resetLocal } from "../../../store/reducers/basketSlice";
 import { useNavigate } from "react-router-dom";
 import userAvatarDefault from "../../../assets/images/userAvatarDefault.jpg";
@@ -10,7 +10,9 @@ import { auth } from "../../../firebase/firebase-config";
 const UserAvatar = ({ props }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { userInfo, loading, setLoading } = useAuth();
+  const isLoggedIn = useSelector((state) => state.users.isLoggedIn);
+  const isLoading = useSelector((state) => state.users.loading);
+  const profile_picture = useSelector((state) => state.users.profile_picture);
   const userFunctions = [
     {
       title: "Profile",
@@ -26,8 +28,7 @@ const UserAvatar = ({ props }) => {
     },
   ];
   const handleSignOut = () => {
-    setLoading(false);
-    signOut(auth);
+    dispatch({ type: "logout" });
     localStorage.removeItem("cartItem");
     localStorage.removeItem("totalAmount");
     localStorage.removeItem("totalQuantity");
@@ -40,7 +41,7 @@ const UserAvatar = ({ props }) => {
   };
   return (
     <div className="user" style={{ position: "relative" }}>
-      {userInfo === null && loading === false && (
+      {!isLoggedIn && (
         <div
           className="authentication"
           onClick={() => {
@@ -50,10 +51,10 @@ const UserAvatar = ({ props }) => {
           Sign in
         </div>
       )}
-      {userInfo !== null && loading === true && (
+      {isLoggedIn && (
         <>
           <img
-            src={userAvatarDefault}
+            src={profile_picture || userAvatarDefault}
             style={{
               width: "30px",
               height: "30px",

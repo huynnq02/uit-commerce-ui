@@ -13,12 +13,12 @@ import { useAuth } from "../../../contexts/auth-context";
 import ProductCheckout from "../../organisms/ProductCheckout/ProductCheckout";
 const ShoppingBasket = () => {
   const dataAmountBasket = useSelector((state) => state.basket.totalAmount);
-  const { userInfo } = useAuth();
+  console.log(dataAmountBasket);
+  const isLoggedIn = useSelector((state) => state.users.isLoggedIn);
   const location = useLocation();
   const navigate = useNavigate();
   const handleClick = () => {
-    if (!userInfo) {
-      console.log(userInfo);
+    if (!isLoggedIn) {
       navigate("/sign-in");
       console.log(location);
     } else {

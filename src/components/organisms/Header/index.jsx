@@ -15,7 +15,7 @@ const Header = ({ authen }) => {
   const getQuantities = useSelector((state) => state.basket.totalQuantity);
   const navigate = useNavigate();
   const { userInfo, loading, setLoading } = useAuth();
-
+  console.log("authen ne:", authen);
   const navItems = [
     {
       icon: null,
@@ -80,9 +80,9 @@ const Header = ({ authen }) => {
             <div className="burger">
               <Menu customBurgerIcon={<MenuLogo />}>
                 {navItems.map((item, idx) => {
-                  if (userInfo === null && item.title === "User") {
+                  if (!authen && item.title === "User") {
                     return null;
-                  } else if (userInfo !== null && item.title === "Sign In") {
+                  } else if (!authen && item.title === "Sign In") {
                     return null;
                   } else {
                     return (

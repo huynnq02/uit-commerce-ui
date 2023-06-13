@@ -1,5 +1,5 @@
 /**
- * Sign in page 
+ * Sign in page
  * file: SignInPage.jsx
  */
 
@@ -23,53 +23,46 @@ import ButtonSignIn from "../../../atoms/Button/ButtonSignIn";
 import InputUser from "../../../molecules/Input/InputUser";
 import LayoutAuthentication from "../../../molecules/LayoutAuthentication/LayoutAuthentication";
 import FormAuthentication from "../../../organisms/Form/FormAuthentication";
+import { useDispatch } from "react-redux";
+import { getAPIActionJSON } from "../../../../../api/ApiActions";
 
 const SignInPage = (props) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
-  //get users
-  useEffect(() => {
-    const colRef = collection(db, "users");
-    getDocs(colRef).then((snapshot) => {
-      let listUsers = [];
-      snapshot.docs.forEach((doc) => {
-        listUsers.push({ id: doc.id, ...doc.data() });
-      });
-      setUsers(listUsers);
-    });
-  }, []);
-  // console.log(users);
-  //Bias redux
+  const handleResponse = (response) => {
+    console.log("RESPONSEEEE");
+    console.log(response.message); // Check the value of the error message
+    console.log(response.success); // Check the value of the error message
+
+    if (!response.success) {
+      toast.error(response.message);
+      console.log(response.message);
+      return;
+    }
+    navigate("/");
+  };
+  const handleSignIn = async (values) => {
+    console.log("DATAAAAA");
+    console.log(values);
+    dispatch(
+      getAPIActionJSON(
+        "login_user",
+        {
+          email: values.email,
+          password: values.password,
+        },
+        null,
+        "",
+        (e) => handleResponse(e)
+      )
+    );
+  };
   const [togglePassword, setTogglePassword] = useState(false);
   const handleTogglePassword = () => {
     setTogglePassword(!togglePassword);
   };
-  //function check user status
-  function statusUser(email, users) {
-    let checkUser = true;
-    users.forEach((user) => {
-      if (user.email === email && user.status === "passive") {
-        checkUser = false;
-        return;
-      }
-    });
-    return checkUser;
-  }
-  //Handle sign in
-  const handleSignIn = async (values) => {
-    try {
-      if (statusUser(values.email, users) === false) {
-        toast.error("User is not active");
-        return;
-      }
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-      navigate("/");
-    } catch (errors) {
-      toast.error("Your email or password is incorrect");
-    }
-    // navigate("/");
 
-  };
   //Sign in with google
   const googleSignIn = async () => {
     const provider = new GoogleAuthProvider();

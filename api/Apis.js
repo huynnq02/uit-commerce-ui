@@ -14,4 +14,9 @@ export const getAPIs = {
     path: "/api/items/get_all_items",
     method: "GET",
   },
+  update_user: {
+    name: "update_user",
+    path: "/api/users/update_user",
+    method: "PUT",
+  },
 };

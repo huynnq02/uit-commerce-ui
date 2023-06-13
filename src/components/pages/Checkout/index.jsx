@@ -22,7 +22,9 @@ moment().format();
 
 const Checkout = () => {
   const dataBasket = useSelector((state) => state.basket);
-  const { userInfo } = useAuth();
+  const isLoggedIn = useSelector((state) => state.users.isLoggedIn);
+  const userInfo = useSelector((state) => state.users);
+  console.log("data ne", userInfo);
   const location = useLocation();
   const [accountInfo, setAccountInfo] = useState();
   // const formikRef = useRef();
@@ -34,20 +36,11 @@ const Checkout = () => {
   };
 
   useEffect(() => {
-    const unSub = auth.onAuthStateChanged(async (user) => {
-      unSub();
-      if (user) {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const result = await getDoc(userRef);
-        setAccountInfo(result.data());
-        // const result = getDoc(userRef)
-        //   .then((res) => setAccountInfo({ ...res.data() }))
-        //   .catch((err) => console.log(err));
-      } else {
-        navigate("/");
-      }
-    });
-  });
+    if (!isLoggedIn) {
+      navigate("/");
+      return;
+    }
+  }, [isLoggedIn, navigate]);
 
   return (
     <section className="checkout">
@@ -87,16 +80,16 @@ const Checkout = () => {
           // ref={(ref) => (formikRef.current = ref)}
           initialValues={{
             firstname:
-              accountInfo?.fullname.split(" ").length > 1
-                ? accountInfo?.fullname.split(" ")[0]
-                : accountInfo?.fullname,
+              userInfo.name.split(" ").length > 1
+                ? userInfo?.name.split(" ")[0]
+                : userInfo?.name,
             lastname:
-              accountInfo?.fullname.split(" ").length > 1
-                ? accountInfo.fullname.split(" ")[1]
+              userInfo?.name.split(" ").length > 1
+                ? userInfo.name.split(" ").slice(1).join(" ")
                 : "",
-            email: accountInfo?.email,
-            phone: accountInfo?.phonenumber,
-            billing: accountInfo?.address,
+            email: userInfo?.email,
+            phone: userInfo?.phone_number,
+            billing: userInfo?.address,
             cardnumber: "",
             cvc: "",
             expirydate: "",
@@ -200,7 +193,7 @@ const Checkout = () => {
                 <Grid item xs={6}>
                   <Field
                     value={values.lastname}
-                    label="Last name"
+                    // label="Last name"
                     onChange={handleChange}
                     component={TextField}
                     name="lastname"
