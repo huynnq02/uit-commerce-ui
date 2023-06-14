@@ -40,24 +40,30 @@ const SignInPage = (props) => {
       console.log(response.message);
       return;
     }
+    toast.success("Login successfully!!");
+
     navigate("/");
   };
   const handleSignIn = async (values) => {
-    console.log("DATAAAAA");
-    console.log(values);
-    dispatch(
-      getAPIActionJSON(
-        "login_user",
-        {
-          email: values.email,
-          password: values.password,
-        },
-        null,
-        "",
-        (e) => handleResponse(e)
-      )
-    );
+    try {
+      dispatch(
+        getAPIActionJSON(
+          "login_user",
+          {
+            email: values.email,
+            password: values.password,
+          },
+          null,
+          "",
+          (e) => handleResponse(e)
+        )
+      );
+    } catch (error) {
+      console.log("loi r");
+      console.log(error);
+    }
   };
+
   const [togglePassword, setTogglePassword] = useState(false);
   const handleTogglePassword = () => {
     setTogglePassword(!togglePassword);

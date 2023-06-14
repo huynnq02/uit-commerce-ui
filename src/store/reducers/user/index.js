@@ -12,6 +12,15 @@ const initialState = {
 
 export default function UserReducer(state = initialState, action) {
   switch (action.type) {
+    case "create_order.reply":
+      if (action.data.success === true) {
+        return {
+          ...state,
+          orders: [...state.orders, ...action.data.data], // Concatenate the existing orders with the new data
+        };
+      } else {
+        console.log("Hinh nhu sai o dau do roi huhu");
+      }
     case "update_user.reply":
       if (action.data.success === true) {
         return {

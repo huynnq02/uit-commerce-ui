@@ -55,6 +55,7 @@ const ProductList = (props) => {
       image: data.image,
       totalPrice: data.price * 1,
       productId: data.id,
+      shop: data.shop,
     };
     dispatch(addBasket(productStringify));
   };

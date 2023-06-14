@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { getAPIs } from "./Apis";
 import customAxios from "./AxiosInterceptors";
 
@@ -22,7 +23,6 @@ export function getAPIActionJSON(
       data: data,
       headers: {
         Accept: "application/json",
-        "Content-Type": "multipart/form-data", // Set the content type to 'multipart/form-data'
       },
     })
       .then(function (response) {
@@ -41,7 +41,8 @@ export function getAPIActionJSON(
       .catch((e) => {
         dispatch({ type: "loading.success" });
         onError(e);
-        console.log(e);
+        console.log(e.response.data.message);
+        toast.error(e.response.data.message);
       });
   };
 }

@@ -10,14 +10,15 @@ import { Field, Form, Formik } from "formik";
 import { TextField } from "formik-mui";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../contexts/auth-context";
 import { auth, db } from "../../../firebase/firebase-config";
 import ProductItem from "../../molecules/ProductItem/ProductItem";
 import "./checkout.scss";
-
+import { getAPIActionJSON } from "../../../../api/ApiActions";
+import { removeItem } from "../../../store/reducers/basketSlice";
 moment().format();
 
 const Checkout = () => {
@@ -31,17 +32,62 @@ const Checkout = () => {
   const { cartItem, totalAmount, totalQuantity } = dataBasket;
   const [value, setValue] = useState(moment()); //state này lưu giá trị field ngày tháng
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleDateChange = (newValue) => {
     setValue(newValue);
   };
-
+  console.log("cart item ", cartItem);
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/");
       return;
     }
   }, [isLoggedIn, navigate]);
-
+  const handleResponse = (response) => {
+    if (!response.success) {
+      toast.error(response.message);
+      console.log(response.message);
+      return;
+    }
+    cartItem.forEach((item) => {
+      dispatch(removeItem(item.id)); // Pass the ID of the item to be removed
+    });
+    toast.success("Your order has been confirm!!");
+    navigate("/products");
+  };
+  const handleCreateOrder = async (values) => {
+    const data = {
+      total: totalAmount,
+      address: values.billing,
+      status: "Pending",
+      items: cartItem.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        shop_id: item.shop.id,
+      })),
+      user_id: userInfo.id,
+    };
+    console.log("data", data);
+    dispatch(
+      getAPIActionJSON(
+        "create_order",
+        {
+          total: totalAmount,
+          address: values.billing,
+          status: "Pending",
+          items: cartItem.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+            shop_id: item.shop.id,
+          })),
+          user_id: userInfo.id,
+        },
+        null,
+        "",
+        (e) => handleResponse(e)
+      )
+    );
+  };
   return (
     <section className="checkout">
       {/* <Header /> */}
@@ -112,68 +158,7 @@ const Checkout = () => {
           }}
           enableReinitialize={true}
           onSubmit={async (values, actions) => {
-            // console.log(value.format("DD/MM/YYYY"));
-            let date = value.format("DD/MM/YYYY").split("/")[0];
-            switch (value.format("DD/MM/YYYY").split("/")[1]) {
-              case "1":
-                date += "-Jan-";
-                break;
-              case "2":
-                date += "-Feb-";
-                break;
-              case "3":
-                date += "-Mar-";
-                break;
-              case "4":
-                date += "-Apr-";
-                break;
-              case "5":
-                date += "-May-";
-                break;
-              case "6":
-                date += "-Jun-";
-                break;
-              case "7":
-                date += "-Jul-";
-                break;
-              case "8":
-                date += "-Aug-";
-                break;
-              case "9":
-                date += "-Sep-";
-                break;
-              case "10":
-                date += "-Oct-";
-                break;
-              case "11":
-                date += "-Nov-";
-                break;
-              case "12":
-                date += "-Dec-";
-                break;
-            }
-            date += value.format("DD/MM/YYYY").split("/")[2];
-            const data = await addDoc(collection(db, "listOrdered"), {
-              Total: totalAmount,
-              orderAddress: values.billing,
-              orderDate: date,
-              orderStatus: "Pending",
-              productInfo: cartItem.map((item) => ({
-                productId: item.id,
-                productQuantities: item.quantity,
-              })),
-              shippingTotal: 30000,
-              subTotal: 0,
-              userId: userInfo.id,
-            });
-            //update field id của document bằng cái id được firestore tự động tạo
-            const docRef = doc(db, "listOrdered", data.id);
-            await updateDoc(docRef, {
-              id: data.id,
-            });
-
-            toast.success("Your order has been confirm!!");
-            navigate("/products");
+            handleCreateOrder(values);
           }}
         >
           {({ submitForm, handleChange, values }) => (

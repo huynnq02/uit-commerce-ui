@@ -19,4 +19,9 @@ export const getAPIs = {
     path: "/api/users/update_user",
     method: "PUT",
   },
+  create_order: {
+    name: "create_order",
+    path: "/api/orders/create_order",
+    method: "POST",
+  },
 };

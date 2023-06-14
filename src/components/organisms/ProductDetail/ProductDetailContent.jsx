@@ -37,12 +37,11 @@ const ProductDetailContent = ({
 
   const mdMatches = useMediaQuery("(min-width:600px)");
   const lgMatches = useMediaQuery("(min-width:1200px)");
-  console.log(data);
+  console.log("product detail: ", data);
   const handleAddtoCart = () => {
     if (quant < 1) {
       toast.error("Please choose quantity");
     } else {
-      console.log(colorPicker);
       const productStringify = {
         id: nanoid(),
         category: data.category,
@@ -55,7 +54,9 @@ const ProductDetailContent = ({
         image: data.image,
         totalPrice: data.price * quant,
         productId: productId,
+        shop: data.shop,
       };
+      console.log("productStringify", productStringify);
       dispatch(addBasket(productStringify));
     }
   };
@@ -97,6 +98,13 @@ const ProductDetailContent = ({
           </Grid>
           <Grid item xs={12} lg={6}>
             <Container maxWidth="sm" style={{ padding: "28px" }}>
+              <h3
+                className="productDetail__topContent-name"
+                style={{ color: "black" }}
+              >
+                {data.shop?.name}
+              </h3>
+
               <div className="productDetail__topContent">
                 <h3 className="productDetail__topContent-name">{data.name}</h3>
                 <p className="productDetail__topContent-price">

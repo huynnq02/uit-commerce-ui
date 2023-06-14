@@ -1,14 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { toast } from 'react-toastify';
+import { createSlice } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
-const cartItem = localStorage.getItem('cartItem')
-  ? JSON.parse(localStorage.getItem('cartItem'))
+const cartItem = localStorage.getItem("cartItem")
+  ? JSON.parse(localStorage.getItem("cartItem"))
   : [];
-const totalQuantity = localStorage.getItem('totalQuantity')
-  ? JSON.parse(localStorage.getItem('totalQuantity'))
+const totalQuantity = localStorage.getItem("totalQuantity")
+  ? JSON.parse(localStorage.getItem("totalQuantity"))
   : 0;
-const totalAmount = localStorage.getItem('totalAmount')
-  ? JSON.parse(localStorage.getItem('totalAmount'))
+const totalAmount = localStorage.getItem("totalAmount")
+  ? JSON.parse(localStorage.getItem("totalAmount"))
   : 0;
 const initialState = {
   cartItem, //save items in local storage cart
@@ -18,18 +18,19 @@ const initialState = {
 
 const setItemToLocal = (cartItem, amount, quantities) => {
   localStorage.setItem(
-    'cartItem',
+    "cartItem",
     JSON.stringify(cartItem.map((item) => item))
   );
-  localStorage.setItem('totalAmount', JSON.stringify(amount));
-  localStorage.setItem('totalQuantity', JSON.stringify(quantities));
+  localStorage.setItem("totalAmount", JSON.stringify(amount));
+  localStorage.setItem("totalQuantity", JSON.stringify(quantities));
 };
 const basketSlice = createSlice({
-  name: 'basket',
+  name: "basket",
   initialState,
   reducers: {
     addBasket: (state, action) => {
       const newBasket = action.payload;
+      console.log("newBasket", newBasket);
       const foundBasket = state.cartItem.find(
         (item) => item.productId === newBasket.productId
       );
