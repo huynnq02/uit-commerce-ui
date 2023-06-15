@@ -17,7 +17,10 @@ import { useAuth } from "../../../contexts/auth-context";
 import { auth, db } from "../../../firebase/firebase-config";
 import ProductItem from "../../molecules/ProductItem/ProductItem";
 import "./checkout.scss";
-import { getAPIActionJSON } from "../../../../api/ApiActions";
+import {
+  getAPIActionJSON,
+  getAPIActionJSONNoMulti,
+} from "../../../../api/ApiActions";
 import { removeItem } from "../../../store/reducers/basketSlice";
 moment().format();
 
@@ -61,7 +64,7 @@ const Checkout = () => {
       address: values.billing,
       status: "Pending",
       items: cartItem.map((item) => ({
-        id: item.id,
+        id: item.productId,
         quantity: item.quantity,
         shop_id: item.shop.id,
       })),
@@ -69,14 +72,14 @@ const Checkout = () => {
     };
     console.log("data", data);
     dispatch(
-      getAPIActionJSON(
+      getAPIActionJSONNoMulti(
         "create_order",
         {
           total: totalAmount,
           address: values.billing,
           status: "Pending",
           items: cartItem.map((item) => ({
-            id: item.id,
+            id: item.productId,
             quantity: item.quantity,
             shop_id: item.shop.id,
           })),

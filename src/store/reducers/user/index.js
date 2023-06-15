@@ -12,11 +12,28 @@ const initialState = {
 
 export default function UserReducer(state = initialState, action) {
   switch (action.type) {
+    case "check_item_bought.reply":
+      if (action.data.success === true) {
+        return {
+          ...state,
+        };
+      } else {
+        console.log("Hinh nhu sai o dau do roi huhu");
+      }
     case "create_order.reply":
       if (action.data.success === true) {
         return {
           ...state,
           orders: [...state.orders, ...action.data.data], // Concatenate the existing orders with the new data
+        };
+      } else {
+        console.log("Hinh nhu sai o dau do roi huhu");
+      }
+    case "get_user_orders.reply":
+      if (action.data.success === true) {
+        return {
+          ...state,
+          orders: action.data.data, // Concatenate the existing orders with the new data
         };
       } else {
         console.log("Hinh nhu sai o dau do roi huhu");

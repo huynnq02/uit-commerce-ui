@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { nanoid } from "@reduxjs/toolkit";
 import { addBasket } from "../../../store/reducers/basketSlice";
@@ -15,6 +15,7 @@ import SubImage from "../../atoms/SubImage/SubImage";
 import SliderSlick from "../../molecules/SliderSlick/SliderSlick";
 import { useNavigate } from "react-router-dom";
 import parse from "html-react-parser";
+import { getAPIActionJSON } from "../../../../api/ApiActions";
 const ProductDetailContent = ({
   data,
   sizePicker,
@@ -26,18 +27,66 @@ const ProductDetailContent = ({
   colorPicker,
   productId,
 }) => {
+  const isLoggedIn = useSelector((state) => state.users.isLoggedIn);
+  const userId = useSelector((state) => state.users.id);
+  const [isBought, setIsBought] = useState(false);
+  const dispatch = useDispatch();
+  console.log("is logged in: ", isLoggedIn);
+  console.log("user id: ", userId);
+  console.log("product id: ", productId);
+
+  const handleResponse = (response) => {
+    console.log(response);
+    if (!response.success) {
+      console.log("nooooooooooooo", response);
+      return;
+    }
+    console.log("response: ", response.success);
+    setIsBought(response.success);
+  };
+  const checkItemBought = () => {
+    dispatch(
+      getAPIActionJSON(
+        "check_item_bought",
+        null,
+        null,
+        `/${userId}/${productId}`,
+        (e) => handleResponse(e)
+      )
+    );
+  };
+  useEffect(() => {
+    if (isLoggedIn) {
+      checkItemBought();
+    }
+  }, [isBought, isLoggedIn]);
   //state này để lưu size S,M,L,...
   //ban đầu ấn add to basket sẽ lưu vô local
   // const [sizePicker, setSizePicker] = useState(data.sizes[0]);
   // const [quant, setQuant] = useState(1);
   //Lấy ra ở đây để dùng trong các trường hợp query 1 sản phẩm theo id
   const [defaultImage, setDefaultImage] = useState(data.image);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [reviewText, setReviewText] = useState(""); // State for the review text
+  const [rating, setRating] = useState(0); // State for the star rating
   const mdMatches = useMediaQuery("(min-width:600px)");
   const lgMatches = useMediaQuery("(min-width:1200px)");
   console.log("product detail: ", data);
+
+  const handleReviewTextChange = (event) => {
+    setReviewText(event.target.value);
+  };
+
+  const handleRatingChange = (value) => {
+    setRating(value);
+  };
+
+  const handleAddReview = () => {
+    // Add logic to submit the review and rating
+    console.log("Review Text:", reviewText);
+    console.log("Rating:", rating);
+  };
+
   const handleAddtoCart = () => {
     if (quant < 1) {
       toast.error("Please choose quantity");
@@ -193,6 +242,41 @@ const ProductDetailContent = ({
             </Container>
           </Grid>
         </Grid>
+        {isLoggedIn && isBought && (
+          <div>
+            <div className="productDetail__rating">
+              <h5 className="productDetail__rating-title">Rate this product</h5>
+              <div className="productDetail__rating-buttons">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    className={`productDetail__rating-button ${
+                      value <= rating ? "active" : ""
+                    }`}
+                    onClick={() => handleRatingChange(value)}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="productDetail__review">
+              <h5 className="productDetail__review-title">Write a Review</h5>
+              <textarea
+                className="productDetail__review-input"
+                placeholder="Enter your review..."
+                value={reviewText}
+                onChange={handleReviewTextChange}
+              />
+              <button
+                className="productDetail__review-submit"
+                onClick={handleAddReview}
+              >
+                Xác nhận đánh giá
+              </button>
+            </div>
+          </div>
+        )}
       </Container>
     </div>
   );

@@ -1,4 +1,14 @@
 export const getAPIs = {
+  check_item_bought: {
+    name: "check_item_bought",
+    path: "/api/items/check_item_bought",
+    method: "GET",
+  },
+  get_user_orders: {
+    name: "get_user_orders",
+    path: "/api/orders/get_user_orders",
+    method: "GET",
+  },
   login_user: {
     name: "login_user",
     path: "/api/auth/login_user",

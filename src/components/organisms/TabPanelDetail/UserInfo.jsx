@@ -65,12 +65,29 @@ const UserInfo = () => {
       )
     );
   };
+  const orders = useSelector((state) => state.users.orders);
 
+  const handleResponseGetOrders = (response) => {
+    console.log(response);
+    if (!response.success) {
+      console.log("nooooooooooooo", response);
+      return;
+    }
+    console.log("order: ", orders);
+  };
+  const getOrders = () => {
+    dispatch(
+      getAPIActionJSON("get_user_orders", null, null, `/${userId}`, (e) =>
+        handleResponseGetOrders(e)
+      )
+    );
+  };
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
     else {
       setAccountInfo(userInfo);
     }
+    getOrders();
   }, [isLoggedIn, navigate, userInfo]);
 
   return (
