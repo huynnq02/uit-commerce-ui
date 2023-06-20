@@ -15,7 +15,11 @@ import SubImage from "../../atoms/SubImage/SubImage";
 import SliderSlick from "../../molecules/SliderSlick/SliderSlick";
 import { useNavigate } from "react-router-dom";
 import parse from "html-react-parser";
-import { getAPIActionJSON } from "../../../../api/ApiActions";
+
+import {
+  getAPIActionJSON,
+  getAPIActionJSONNoMulti,
+} from "../../../../api/ApiActions";
 const ProductDetailContent = ({
   data,
   sizePicker,
@@ -31,6 +35,8 @@ const ProductDetailContent = ({
   const userId = useSelector((state) => state.users.id);
   const [isBought, setIsBought] = useState(false);
   const dispatch = useDispatch();
+  const [reviewList, setReviewList] = useState([]);
+
   console.log("is logged in: ", isLoggedIn);
   console.log("user id: ", userId);
   console.log("product id: ", productId);
@@ -41,8 +47,8 @@ const ProductDetailContent = ({
       console.log("nooooooooooooo", response);
       return;
     }
-    console.log("response: ", response.success);
-    setIsBought(response.success);
+    console.log("response: ", response.data);
+    setIsBought(response.data);
   };
   const checkItemBought = () => {
     dispatch(
@@ -55,7 +61,56 @@ const ProductDetailContent = ({
       )
     );
   };
+  const handleResponseGetReviews = (response) => {
+    console.log(response);
+    if (!response.success) {
+      console.log("nooooooooooooo", response);
+      return;
+    }
+    console.log("responsee review: ", response.data);
+    setReviewList(response.data);
+  };
+  const getReviews = () => {
+    dispatch(
+      getAPIActionJSON(
+        "get_review_of_an_item",
+        null,
+        null,
+        `/${productId}`,
+        (e) => handleResponseGetReviews(e)
+      )
+    );
+  };
+  const handleResponseCreateReview = (response) => {
+    console.log(response);
+    if (!response.success) {
+      console.log("nooooooooooooo", response);
+      return;
+    }
+    console.log("response: ", response.data);
+
+    // Add the new review to the list
+    const newReview = {
+      id: response.id,
+      content: response.content,
+      rating: response.star,
+    };
+    setReviewList((prevList) => [...prevList, newReview]);
+
+    // Clear the review text and rating inputs
+    setReviewText("");
+    setRating(0);
+  };
+  function calculateAverageRating(reviewList) {
+    const totalRating = reviewList.reduce(
+      (sum, review) => sum + parseInt(review.star),
+      0
+    );
+    const averageRating = totalRating / reviewList.length;
+    return averageRating.toFixed(1); // Round to one decimal place
+  }
   useEffect(() => {
+    getReviews();
     if (isLoggedIn) {
       checkItemBought();
     }
@@ -85,6 +140,20 @@ const ProductDetailContent = ({
     // Add logic to submit the review and rating
     console.log("Review Text:", reviewText);
     console.log("Rating:", rating);
+    console.log("Product ID:", productId);
+    dispatch(
+      getAPIActionJSONNoMulti(
+        "create_review",
+        {
+          content: reviewText,
+          star: rating,
+          item: productId,
+        },
+        null,
+        "",
+        (e) => handleResponseCreateReview(e)
+      )
+    );
   };
 
   const handleAddtoCart = () => {
@@ -242,41 +311,85 @@ const ProductDetailContent = ({
             </Container>
           </Grid>
         </Grid>
-        {isLoggedIn && isBought && (
-          <div>
-            <div className="productDetail__rating">
-              <h5 className="productDetail__rating-title">Rate this product</h5>
-              <div className="productDetail__rating-buttons">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <button
-                    key={value}
-                    className={`productDetail__rating-button ${
-                      value <= rating ? "active" : ""
-                    }`}
-                    onClick={() => handleRatingChange(value)}
-                  >
-                    {value}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="productDetail__review">
-              <h5 className="productDetail__review-title">Write a Review</h5>
-              <textarea
-                className="productDetail__review-input"
-                placeholder="Enter your review..."
-                value={reviewText}
-                onChange={handleReviewTextChange}
-              />
-              <button
-                className="productDetail__review-submit"
-                onClick={handleAddReview}
-              >
-                Xác nhận đánh giá
-              </button>
-            </div>
+        <div>
+          <div className="productDetail__rating">
+            <h5 className="productDetail__rating-title">
+              Average Rating: {calculateAverageRating(reviewList)}
+            </h5>
+            {/* <div className="productDetail__rating-stars">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  className={`productDetail__rating-button ${
+                    value <= rating ? "active" : ""
+                  }`}
+                  onClick={() => handleRatingChange(value)}
+                >
+                  {value}
+                </button>
+              ))}
+            </div> */}
+            {/* <p className="productDetail__rating-count">
+              ({reviews?.length} {reviews?.length === 1 ? "review" : "reviews"})
+            </p> */}
           </div>
-        )}
+          <div className="productDetail__review-list">
+            <h5 className="productDetail__review-list-title">Reviews</h5>
+            {reviewList.length === 0 ? (
+              <p className="productDetail__no-reviews">No reviews yet.</p>
+            ) : (
+              reviewList.map((review) => (
+                <div key={review.id} className="productDetail__review-item">
+                  <div className="productDetail__review-item-author">
+                    <img
+                      src={review.author.profile_picture}
+                      alt={review.author.name}
+                      className="productDetail__review-item-author-avatar"
+                    />
+                    <span className="productDetail__review-item-author-name">
+                      {review.author.name}
+                    </span>
+                  </div>
+                  <div className="productDetail__review-item-content">
+                    <p>{review.content}</p>
+                    <div className="productDetail__review-item-rating">
+                      <div className="productDetail__review-item-rating">
+                        Rating: {review.star}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <div className="productDetail__review">
+            {isLoggedIn ? (
+              isBought ? (
+                <>
+                  <h5 className="productDetail__review-title">
+                    Write a Review
+                  </h5>
+                  <textarea
+                    className="productDetail__review-input"
+                    placeholder="Enter your review..."
+                    value={reviewText}
+                    onChange={handleReviewTextChange}
+                  />
+                  <button
+                    className="productDetail__review-submit"
+                    onClick={handleAddReview}
+                  >
+                    Submit Review
+                  </button>
+                </>
+              ) : null
+            ) : (
+              <p className="productDetail__review-login">
+                Login to submit a review.
+              </p>
+            )}
+          </div>
+        </div>
       </Container>
     </div>
   );

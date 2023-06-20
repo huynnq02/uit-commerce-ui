@@ -1,4 +1,14 @@
 export const getAPIs = {
+  get_review_of_an_item: {
+    name: "get_review_of_an_item",
+    path: "/api/reviews/get_review_of_an_item",
+    method: "GET",
+  },
+  create_review: {
+    name: "create_review",
+    path: "/api/reviews/create_review",
+    method: "POST",
+  },
   check_item_bought: {
     name: "check_item_bought",
     path: "/api/items/check_item_bought",

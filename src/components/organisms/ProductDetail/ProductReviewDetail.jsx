@@ -26,7 +26,6 @@ const ProductReviewDetail = ({
   reRender,
   authEditCmtUser,
 }) => {
-  const { userInfo } = useAuth();
   const productId = useParams();
   const [like, setLike] = useState(false); //Kiểm tra tạng thái user like
   const [dislike, setDislike] = useState(false); //Kiểm tra tạng thái user dislike
