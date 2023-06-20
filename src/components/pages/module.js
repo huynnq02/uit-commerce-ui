@@ -1,103 +1,123 @@
-import { lazy, Fragment } from 'react';
+import { lazy, Fragment } from "react";
 
-const About = lazy(() => import('./About/AboutPage'));
-const SignIn = lazy(() => import('./Authentication/SignIn/SignInPage'));
-const SignUp = lazy(() => import('./Authentication/SignUp/SignUpPage'));
+const About = lazy(() => import("./About/AboutPage"));
+const SignIn = lazy(() => import("./Authentication/SignIn/SignInPage"));
+const SignUp = lazy(() => import("./Authentication/SignUp/SignUpPage"));
 const GetPassword = lazy(() =>
-  import('./Authentication/GetPasswordPage/GetPasswordPage')
+  import("./Authentication/GetPasswordPage/GetPasswordPage")
 );
-const Checkout = lazy(() => import('./Checkout'));
-const Home = lazy(() => import('./Home/HomePage'));
-const ProductDetail = lazy(() => import('./ProductDetail/ProductDetail'));
-const ShoppingBasket = lazy(() => import('./ShoppingBasket/ShoppingBasket'));
-const ShoppingList = lazy(() => import('./ShoppingList/ShoppingList'));
-const UserProfile = lazy(() => import('./UserProfile/UserProfile'));
+const Checkout = lazy(() => import("./Checkout"));
+const Home = lazy(() => import("./Home/HomePage"));
+const ProductDetail = lazy(() => import("./ProductDetail/ProductDetail"));
+const ShoppingBasket = lazy(() => import("./ShoppingBasket/ShoppingBasket"));
+const ShoppingList = lazy(() => import("./ShoppingList/ShoppingList"));
+const UserProfile = lazy(() => import("./UserProfile/UserProfile"));
+const CheckoutWithStripe = lazy(() =>
+  import("./CheckoutWithStripe/CheckoutWithStripe")
+);
+const Message = lazy(() => import("./CheckoutWithStripe/Message"));
 
 const RouterLayout = [
   {
-    name: 'home',
-    path: '/',
+    name: "home",
+    path: "/",
     public: true,
     subPath: false,
     children: [],
     element: Home,
   },
   {
-    name: 'about',
-    path: 'about',
+    name: "about",
+    path: "about",
     public: true,
     subPath: false,
     children: [],
     element: About,
   },
   {
-    name: 'signIn',
-    path: 'sign-in',
+    name: "signIn",
+    path: "sign-in",
     public: true,
     subPath: false,
     children: [],
     element: SignIn,
   },
   {
-    name: 'signUp',
-    path: 'sign-up',
+    name: "signUp",
+    path: "sign-up",
     public: true,
     subPath: false,
     children: [],
     element: SignUp,
   },
   {
-    name: 'recoverPassword',
-    path: 'recover-password',
+    name: "recoverPassword",
+    path: "recover-password",
     public: true,
     subPath: false,
     children: [],
     element: GetPassword,
   },
   {
-    name: 'products',
-    path: 'products',
+    name: "products",
+    path: "products",
     subPath: true,
     public: true,
     children: [
       {
-        name: 'products',
-        path: '',
+        name: "products",
+        path: "",
         public: true,
         subPath: false,
         children: [],
         element: ShoppingList,
       },
       {
-        name: 'productDetail',
-        path: ':id',
+        name: "productDetail",
+        path: ":id",
         public: true,
         subPath: false,
         children: [],
         element: ProductDetail,
       },
     ],
-    element: '',
+    element: "",
   },
   {
-    name: 'shoppingBasket',
-    path: 'shopping-basket',
+    name: "shoppingBasket",
+    path: "shopping-basket",
     public: true,
     subPath: false,
     children: [],
     element: ShoppingBasket,
   },
   {
-    name: 'checkout',
-    path: 'checkout',
+    name: "checkout",
+    path: "checkout",
     public: false,
     subPath: false,
     children: [],
     element: Checkout,
   },
   {
-    name: 'user',
-    path: 'user',
+    name: "checkout-with-stripe",
+    path: "checkout-with-stripe",
+    subPath: true,
+    public: false,
+    children: [],
+    element: CheckoutWithStripe,
+  },
+  {
+    name: "success",
+    path: "success",
+    public: false,
+    subPath: false,
+    children: [],
+    element: Message,
+  },
+  {
+    name: "user",
+    path: "user",
     public: false,
     subPath: false,
     children: [],

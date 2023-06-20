@@ -2,7 +2,14 @@
  * Check out page
  * file: (Checkout/) index.jsx
  */
-import { Button, FormHelperText, Grid, OutlinedInput } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  FormHelperText,
+  Grid,
+  OutlinedInput,
+} from "@mui/material";
+import { FormControlLabel, Checkbox } from "@mui/material";
 
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
@@ -30,7 +37,11 @@ const Checkout = () => {
   const userInfo = useSelector((state) => state.users);
   console.log("data ne", userInfo);
   const location = useLocation();
-  const [accountInfo, setAccountInfo] = useState();
+  const [paymentWhenReceive, setPaymentWhenReceive] = useState(false);
+  const handleChangeCheckBox = (value) => {
+    console.log("value", value);
+    setPaymentWhenReceive(!value);
+  };
   // const formikRef = useRef();
   const { cartItem, totalAmount, totalQuantity } = dataBasket;
   const [value, setValue] = useState(moment()); //state này lưu giá trị field ngày tháng
@@ -39,6 +50,7 @@ const Checkout = () => {
   const handleDateChange = (newValue) => {
     setValue(newValue);
   };
+
   console.log("cart item ", cartItem);
   useEffect(() => {
     if (!isLoggedIn) {
@@ -58,7 +70,8 @@ const Checkout = () => {
     toast.success("Your order has been confirm!!");
     navigate("/products");
   };
-  const handleCreateOrder = async (values) => {
+  const handlePaymentWithReceive = (values) => {
+    console.log("go to payment when receive");
     const data = {
       total: totalAmount,
       address: values.billing,
@@ -84,12 +97,51 @@ const Checkout = () => {
             shop_id: item.shop.id,
           })),
           user_id: userInfo.id,
+          is_paid: false,
         },
         null,
         "",
         (e) => handleResponse(e)
       )
     );
+  };
+  const handlePaymentWithCard = () => {
+    navigate("/checkout-with-stripe");
+  };
+  const handleCreateOrder = async (values) => {
+    console.log("go to checkout");
+    navigate("/checkout-with-stripe");
+    // const data = {
+    //   total: totalAmount,
+    //   address: values.billing,
+    //   status: "Pending",
+    //   items: cartItem.map((item) => ({
+    //     id: item.productId,
+    //     quantity: item.quantity,
+    //     shop_id: item.shop.id,
+    //   })),
+    //   user_id: userInfo.id,
+    // };
+    // console.log("data", data);
+    // dispatch(
+    //   getAPIActionJSONNoMulti(
+    //     "create_order",
+    //     {
+    //       total: totalAmount,
+    //       address: values.billing,
+    //       status: "Pending",
+    //       items: cartItem.map((item) => ({
+    //         id: item.productId,
+    //         quantity: item.quantity,
+    //         shop_id: item.shop.id,
+    //       })),
+    //       user_id: userInfo.id,
+    //     },
+    //     null,
+    //     "",
+    //     (e) => handleResponse(e)
+    //   )
+    // );
   };
   return (
     <section className="checkout">
@@ -161,7 +213,14 @@ const Checkout = () => {
           }}
           enableReinitialize={true}
           onSubmit={async (values, actions) => {
-            handleCreateOrder(values);
+            // handleCreateOrder(values);
+
+            // Use the flag variable to perform the appropriate action
+            if (!paymentWhenReceive) {
+              handlePaymentWithCard(values);
+            } else {
+              handlePaymentWithReceive(values);
+            }
           }}
         >
           {({ submitForm, handleChange, values }) => (
@@ -221,7 +280,9 @@ const Checkout = () => {
                 </Grid>
                 <Grid item xs={8}>
                   <Field component={TextField} name="cardnumber" type="text" />
-                  <Field component={FormHelperText}>Card number</Field>
+                  <Field component={FormHelperText}>
+                    Card number (If empty is payment when receive)
+                  </Field>
                 </Grid>
                 <Grid item xs={4}>
                   <Field component={TextField} name="cvc" type="text" />
@@ -240,13 +301,30 @@ const Checkout = () => {
                   <Field component={TextField} name="zip" type="text" />
                   <Field component={FormHelperText}>ZIP code</Field>
                 </Grid>
+                <Grid item xs={9}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={values.paymentWhenReceive}
+                        onChange={() =>
+                          handleChangeCheckBox(event.target.checked)
+                        }
+                        name="paymentWhenReceive"
+                        color="primary"
+                        labelPlacement="end"
+                      />
+                    }
+                    label="Payment when receive"
+                  />
+                </Grid>
+
                 <Grid item xs={12}>
                   <Button
                     onClick={submitForm}
                     variant="contained"
                     color="primary"
                   >
-                    Confirm payment
+                    Order
                   </Button>
                 </Grid>
               </Grid>
