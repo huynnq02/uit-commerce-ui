@@ -24,6 +24,7 @@ import { useAuth } from "../../../contexts/auth-context";
 import { auth, db } from "../../../firebase/firebase-config";
 import ProductItem from "../../molecules/ProductItem/ProductItem";
 import "./checkout.scss";
+
 import {
   getAPIActionJSON,
   getAPIActionJSONNoMulti,
@@ -57,18 +58,18 @@ const Checkout = () => {
       navigate("/");
       return;
     }
-  }, [isLoggedIn, navigate]);
-  const handleResponse = (response) => {
+  }, [isLoggedIn, paymentWhenReceive]);
+  const handleResponse = (response, bool) => {
     if (!response.success) {
       toast.error(response.message);
       console.log(response.message);
       return;
     }
-    cartItem.forEach((item) => {
-      dispatch(removeItem(item.id)); // Pass the ID of the item to be removed
-    });
-    toast.success("Your order has been confirm!!");
-    navigate("/products");
+
+    if (bool === true) {
+      toast.success("Your order has been confirm!!");
+      navigate("/products");
+    }
   };
   const handlePaymentWithReceive = (values) => {
     console.log("go to payment when receive");
@@ -79,7 +80,7 @@ const Checkout = () => {
       items: cartItem.map((item) => ({
         id: item.productId,
         quantity: item.quantity,
-        shop_id: item.shop.id,
+        shop_id: "647ef625df0d18c2f70b1c98",
       })),
       user_id: userInfo.id,
     };
@@ -94,18 +95,52 @@ const Checkout = () => {
           items: cartItem.map((item) => ({
             id: item.productId,
             quantity: item.quantity,
-            shop_id: item.shop.id,
+            shop_id: "647ef625df0d18c2f70b1c98",
           })),
           user_id: userInfo.id,
           is_paid: false,
         },
         null,
         "",
-        (e) => handleResponse(e)
+        (e) => handleResponse(e, true)
       )
     );
   };
-  const handlePaymentWithCard = () => {
+  const handlePaymentWithCard = (values) => {
+    console.log("go to payment when receive");
+    const data = {
+      total: totalAmount,
+      address: values.billing,
+      status: "Pending",
+      items: cartItem.map((item) => ({
+        id: item.productId,
+        quantity: item.quantity,
+        shop_id: "647ef625df0d18c2f70b1c98",
+      })),
+      user_id: userInfo.id,
+    };
+    console.log("data", data);
+    dispatch(
+      getAPIActionJSONNoMulti(
+        "create_order",
+        {
+          total: totalAmount,
+          address: values.billing,
+          status: "Pending",
+          items: cartItem.map((item) => ({
+            id: item.productId,
+            quantity: item.quantity,
+            shop_id: "647ef625df0d18c2f70b1c98",
+          })),
+          user_id: userInfo.id,
+          is_paid: false,
+        },
+        null,
+        "",
+        (e) => handleResponse(e, false)
+      )
+    );
+
     navigate("/checkout-with-stripe");
   };
   const handleCreateOrder = async (values) => {
@@ -216,10 +251,13 @@ const Checkout = () => {
             // handleCreateOrder(values);
 
             // Use the flag variable to perform the appropriate action
-            if (!paymentWhenReceive) {
+            console.log("paymentWhenReceive", paymentWhenReceive);
+            if (paymentWhenReceive == false) {
+              console.log("paymentwithcard");
               handlePaymentWithCard(values);
             } else {
               handlePaymentWithReceive(values);
+              console.log("paymentwithreceive");
             }
           }}
         >
